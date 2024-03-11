@@ -17,7 +17,7 @@ dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.mi
 server = Flask(__name__)
 
 # Initialize Dash app
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.LUX, dbc_css])
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.COSMO, dbc_css])
 
 def create_app_layout():
     return dbc.Container(
@@ -25,15 +25,82 @@ def create_app_layout():
             dbc.NavbarSimple(
                 id = "navbar",
                 children=[
-                    dbc.NavItem(dbc.NavLink("Pagina iniziale", href="/", style={'font-size': '15px'})),
+                    #dbc.NavItem(dbc.NavLink("Pagina iniziale", href="/", style={'font-size': '15px'})),
                     ## add space between images
                     #html.Div(style={'display': 'inline-block', 'width': '5px'}),
                     #html.Img(src='/static/icons/Logo_semeion.png', height="100px"),
                 ],
-                brand="Air Quality Controller Simulator",
+                brand="Imaging based air Quality Controller Simulator",
                 brand_href="#",
                 color="primary",
                 dark=True,
+            ),
+            html.Hr(),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H5("Volume(m^3)"),
+                            dbc.InputGroup(
+                                [
+                                    dbc.Button("-", id="input-volume_minus", n_clicks=0),
+                                    dbc.Input(id="value-volume", placeholder="27", disabled=True, value=27), # 10 m^2
+                                    dbc.Button("+", id="input-volume_plus", n_clicks=0),
+                                ]
+                            ),
+                        ],
+                        width=3
+                    ),
+                    dbc.Col(
+                        [
+                            html.H5("Pump capacity(L/min)"),
+                            dbc.InputGroup(
+                                [
+                                    dbc.Button("-", id="input-pumpL_minus", n_clicks=0),
+                                    dbc.Input(id="value-pumpL", placeholder="566", disabled=True, value=566),#566 = 10 cfm
+                                    dbc.Button("+", id="input-pumpL_plus", n_clicks=0),
+                                ]
+                            ),
+                        ],
+                        width=3,
+                    ),
+                    dbc.Col(
+                        [
+                            html.H5("N pumps"),
+                            dbc.InputGroup(
+                                [
+                                    dbc.Button("-", id="input-pumpN_minus", n_clicks=0),
+                                    dbc.Input(id="value-pumpN", placeholder="4", disabled=True, value=4),
+                                    dbc.Button("+", id="input-pumpN_plus", n_clicks=0),
+                                ]
+                            ),
+                        ],
+                        width=3,
+                    ),
+                    dbc.Col(
+                        [
+                            html.H6("CO threshold(mg/m^3)"),
+                            dbc.InputGroup(
+                                [
+                                    dbc.Button("-", id="input-threshold_minus", n_clicks=0),
+                                    dbc.Input(id="value-threshold", placeholder="0", disabled=True, value=5.725),
+                                    dbc.Button("+", id="input-threshold_plus", n_clicks=0),
+                                ]
+                            ),
+                        ],
+                        width=3,
+                    ),
+                ],
+                style={'textAlign': 'center'},
+            ),
+            html.Hr(),
+            dbc.Row(
+                [
+                    dbc.Col(dbc.Badge("People detected 0", color="danger", className="me-1")),
+                    dbc.Col(dbc.Badge("Pump power 0%", color="danger", className="me-1")),
+                    dbc.Col(dbc.Badge("Anomalies variables", color="danger", className="me-1")),
+                    dbc.Col(dbc.Badge("Anomalies detected", color="danger", className="me-1")),
+                ],
             ),
             html.Hr(),
             dbc.Row(
@@ -59,16 +126,17 @@ def create_app_layout():
                                 id='live-update-graph',
                                 style={'width': '100%', 'height': 'auto'}
                             ),
-                            html.Br(),
                             html.Hr(),
                             dbc.Row(
                                 [
-                                    #dbc.Button("Start", id="start-button", n_clicks=0, color="primary", className="mr-1"),
-                                    #dbc.Button("Stop", id="stop-button", n_clicks=0, color="danger", className="mr-1"),
+                                    dbc.Col(dbc.Button("Start Simulation", id="start-simulation-button", n_clicks=0, color="primary", className="mr-1")),
+                                    dbc.Col(dbc.Button("Stop Simulation", id="stop-simulation-button", n_clicks=0, color="danger", className="mr-1")),
+                                    dbc.Col(dbc.Button("Simulate fault", id="fault-simulation-button", n_clicks=0, color="danger", className="mr-1")),
                                 ],
+                                id = "Badges_anomalies",
                             ),
                         ],
-                        width=6
+                        width=6,
                     ),
                 ],
                 style={'textAlign': 'center'},
