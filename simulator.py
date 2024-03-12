@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy as np
 from queue import Queue
+import pickle
+from predictor import Predictor
 
 class Simulator():
     people_thread_safe = Queue(maxsize=1)
     status_dict = {
-        "CO(mg/m^3)": 0.015,
+        "CO(mg/m^3)": 0.2,
         "Volume(m^3)": 30,
         "N_people": 0,
         "Ambient-Air-Pump(L/min)": 680,
@@ -15,10 +17,9 @@ class Simulator():
     threshold = 10.305
     fault_active = False
     index = 0
-        #CO(mg/m^3),Volume(m^3),N_people,Ambient-Air-Pump(L/min),Ambient-Air-Pump_power(%),Ambient-Air-Pump_number,CO(mg/m^3)_Dt
     predictions = [0 for i in range(10)]
     columns = ['CO(mg/m^3)', 'Volume(m^3)', 'N_people', 'Ambient-Air-Pump(L/min)', 'Ambient-Air-Pump_power(%)', 'Ambient-Air-Pump_number', 'CO(mg/m^3)_Dt']
-    CO_log = []
+    CO_log = [status_dict["CO(mg/m^3)"]]
     active = False
 
     @staticmethod
@@ -28,11 +29,9 @@ class Simulator():
     
     @staticmethod
     def simulate_time_step():
-        return Simulator.status_dict
-        #self.people_now = self.people_now
-        #self.pump_power = self.optimize(self.predict(self.CO, self.pump_power))
-        #df_new = self.modell_call(self.CO, self.volume, self.pumps_l_min, self.pump_power, self.n_pumps, self.index)
-        #df_new['CO(mg/m^3)_final'] += (np.random.rand(1)[0]*2 -1)* 0.01 * df_new['CO(mg/m^3)_final']
-        #self.CO = df_new['CO(mg/m^3)_final'].values[0]
-        #self.df_sim = pd.concat([self.df_sim,df_new])
-        #self.index += 1
+        prediction_CO = Predictor.predict(Simulator.status_dict)
+        prediction_CO += ((np.random.rand(1)[0]*2 -1)* 0.05 * 0.05)
+        Simulator.predictions = Predictor.predict_n_steps(Simulator.status_dict, 10)
+        Simulator.CO_log.append(prediction_CO)
+        Simulator.status_dict["CO(mg/m^3)"] = prediction_CO
+

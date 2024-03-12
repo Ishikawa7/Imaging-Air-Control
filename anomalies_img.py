@@ -1,14 +1,23 @@
 # import simple queue
-from queue import SimpleQueue
-import pickle as pkl
-# create a static class to hold the image and process it
+from queue import Queue
+import pickle
+
 class FrameAnomalyDetector:
-    frames_queue = SimpleQueue(maxsize=1)
+    detected = Queue(maxsize=1)
+    an_log = [0]
     # load frame anomaly model with pickle
-    with open('frame_anomaly_model.pkl', 'rb') as f:
-        frame_anomaly_model = pkl.load("iforest_model_detected.pkl")
+    frame_anomaly_model = pickle.load(open('iforest_model_detected.pkl', 'rb'))
+    
+    @staticmethod
+    def update_detected(df_detected):
+        FrameAnomalyDetector.detected.put(df_detected)
 
     @staticmethod
     def get_frame_anomaly():
-        last_frame = FrameAnomalyDetector.frames_queue.get()
-        return FrameAnomalyDetector.frame_anomaly_model.predict(last_frame)
+        # if queue is empty, return 0
+        if FrameAnomalyDetector.detected.empty():
+            return FrameAnomalyDetector.an_log[-1]
+        df_detected = FrameAnomalyDetector.detected.get()
+        an_score =  round(FrameAnomalyDetector.frame_anomaly_model.decision_function(df_detected)[0], 3)
+        FrameAnomalyDetector.an_log.append(an_score)
+        return an_score
