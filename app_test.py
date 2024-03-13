@@ -107,9 +107,9 @@ def create_app_layout():
             dbc.Row(
                 [
                     dbc.Col(html.H4(["People detected ",dbc.Badge("0", color="light", text_color="info", className="ms-1")])),
-                    dbc.Col(html.H4(["Pump power ",dbc.Badge("0%", color="danger", className="me-1", id="pump-power")])),
-                    dbc.Col(html.H4(["Anomaly score (variables) ", dbc.Badge("0", color="danger", className="me-1")])),
-                    dbc.Col(html.H4(["Anomaly score (imaging) ", dbc.Badge("0", color="danger", className="me-1")])),
+                    dbc.Col(html.H4(["Pump power ",dbc.Badge("0%", color="light", className="me-1", id="pump-power")])),
+                    dbc.Col(html.H4(["Anomaly score (variables) ", dbc.Badge("0", color="light", className="me-1")])),
+                    dbc.Col(html.H4(["Anomaly score (imaging) ", dbc.Badge("0", color="light", className="me-1")])),
                 ],
                 id = "info-row",
             ),
@@ -218,26 +218,37 @@ def simulation_step(n_clicks, n):
     an_imaging = FrameAnomalyDetector.get_frame_anomaly()
     an_imaging_log = FrameAnomalyDetector.an_log
     an_variables = VariablesAnomalyDetector.get_variables_anomaly(sim_status)
-    an_variables_log = VariablesAnomalyDetector.an_log
+    an_variables_log = VariablesAnomalyDetector.an_log 
 
     fig_an_imaging = px.line(x=[i for i in range(len(an_imaging_log))], y=an_imaging_log, markers=True, template="plotly_white")
-    fig_an_imaging.update_traces(line=dict(color='black', width=3))
+    fig_an_imaging.update_traces(line=dict(color='#0d0887', width=3))
     fig_an_imaging.update_layout(transition_duration=100)
 
     fig_an_variables = px.line(x=[i for i in range(len(an_variables_log))], y=an_variables_log, markers=True, template="plotly_white")
-    fig_an_variables.update_traces(line=dict(color='black', width=3))
+    fig_an_variables.update_traces(line=dict(color='#bd3786', width=3))
     fig_an_variables.update_layout(transition_duration=100)
 
     fig_simulation = go.Figure()
     fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO))], y=sim_log_CO, name='CO(mg/m^3)', line=dict(color='green', width=4)))
     fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO)-1,len(sim_log_CO)+10-1)], y=sim_predictions, name='CO(mg/m^3) predicted', line=dict(color='blue', width=4, dash='dash')))
+    fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO)+10-1)], y=[Simulator.threshold for i in range(len(sim_log_CO)+10-1)], name='threshold', line=dict(color='red', width=3, dash='dot')))
     fig_simulation.update_layout(transition_duration=100)
     fig_simulation.update_layout(template="plotly_white")
+
+    if an_imaging > 0.0:
+        color_badge_imaging = "warning"
+    else:
+        color_badge_imaging = "success"
+    if an_variables > 0.0:
+        color_badge_variables = "warning"
+    else:
+        color_badge_variables = "success"
+
     info_row = [
         dbc.Col(html.H4(["People detected ",dbc.Badge(sim_status["N_people"], color="light", text_color="info", className="ms-1")])),
-        dbc.Col(html.H4(["Pump power ",dbc.Badge(sim_status["Ambient-Air-Pump_power(%)"], color="danger", className="me-1", id="pump-power")])),
-        dbc.Col(html.H4(["Anomaly score (variables) ", dbc.Badge(an_variables, color="danger", className="me-1")])),
-        dbc.Col(html.H4(["Anomaly score (imaging) ", dbc.Badge(an_imaging, color="danger", className="me-1")]))
+        dbc.Col(html.H4(["Pump power ",dbc.Badge(str(sim_status["Ambient-Air-Pump_power(%)"])+"%", color="light", className="me-1", id="pump-power")])),
+        dbc.Col(html.H4(["Anomaly score (variables) ", dbc.Badge(an_variables, color=color_badge_variables, className="me-1")])),
+        dbc.Col(html.H4(["Anomaly score (imaging) ", dbc.Badge(an_imaging, color=color_badge_imaging, className="me-1")]))
     ]
     
     return fig_simulation, fig_an_imaging, fig_an_variables, info_row

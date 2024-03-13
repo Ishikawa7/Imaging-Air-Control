@@ -18,6 +18,6 @@ class FrameAnomalyDetector:
         if FrameAnomalyDetector.detected.empty():
             return FrameAnomalyDetector.an_log[-1]
         df_detected = FrameAnomalyDetector.detected.get()
-        an_score =  round(FrameAnomalyDetector.frame_anomaly_model.decision_function(df_detected)[0], 3)
+        an_score =  round(FrameAnomalyDetector.frame_anomaly_model.decision_function(df_detected)[0] * 10, 3)
         FrameAnomalyDetector.an_log.append(an_score)
-        return an_score
+        return an_score 

@@ -3,6 +3,7 @@ import numpy as np
 from queue import Queue
 import pickle
 from predictor import Predictor
+from optimizer import Optimizer
 
 class Simulator():
     people_thread_safe = Queue(maxsize=1)
@@ -14,7 +15,7 @@ class Simulator():
         "Ambient-Air-Pump_power(%)" : 0,
         "Ambient-Air-Pump_number": 0,
     }
-    threshold = 10.305
+    threshold = 5.150
     fault_active = False
     index = 0
     predictions = [0 for i in range(10)]
@@ -32,6 +33,7 @@ class Simulator():
         prediction_CO = Predictor.predict(Simulator.status_dict)
         prediction_CO += ((np.random.rand(1)[0]*2 -1)* 0.05 * 0.05)
         Simulator.predictions = Predictor.predict_n_steps(Simulator.status_dict, 10)
+        Simulator.status_dict["Ambient-Air-Pump_power(%)"] = Optimizer.optimize_pump_power(Simulator.status_dict, Simulator.threshold)
         Simulator.CO_log.append(prediction_CO)
         Simulator.status_dict["CO(mg/m^3)"] = prediction_CO
 

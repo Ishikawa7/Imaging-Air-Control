@@ -3,6 +3,7 @@ import torch
 from simulator import Simulator
 import numpy as np
 from anomalies_img import FrameAnomalyDetector
+from anomalies_var import VariablesAnomalyDetector
 import pandas as pd
 
 class Imaging:

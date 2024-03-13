@@ -4,7 +4,6 @@ import pickle
 import numpy as np
 class VariablesAnomalyDetector:
     an_log = [0]
-    # load frame anomaly model with pickle
     variables_anomaly_model = pickle.load(open('iforest_model_variables.pkl', 'rb'))
 
     @staticmethod
@@ -12,6 +11,6 @@ class VariablesAnomalyDetector:
         #if len(VariablesAnomalyDetector.an_log) == 1:
         #    return 0
         array_status_dict = np.array(list(status_dict.values())).reshape(1, -1)
-        an_score =  round(VariablesAnomalyDetector.variables_anomaly_model.decision_function(array_status_dict)[0], 3)
+        an_score =  round(VariablesAnomalyDetector.variables_anomaly_model.decision_function(array_status_dict)[0] * 10, 3)
         VariablesAnomalyDetector.an_log.append(an_score)
         return an_score
