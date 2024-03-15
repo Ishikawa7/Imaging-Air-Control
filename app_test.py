@@ -119,7 +119,7 @@ def create_app_layout():
                     dbc.Col(
                         [
                             html.H4("Webcam Video Stream"),
-                            html.Img(id='live-update-image', src='/static/webcam_logo.png'),
+                            html.Img(id='live-update-image', src='/static/webcam_logo.png', style={'backgroundColor': '#ffffff'}),
                             html.Br(),
                             html.Br(),
                             dbc.Row(
@@ -138,22 +138,22 @@ def create_app_layout():
                                 id='live-update-graph-sim',
                                 style={'width': '100%', 'height': 'auto'}
                             ),
-                            html.Hr(),
-                            dbc.Row(
-                                [
-                                    dbc.Col(dbc.Button("Start Simulation", id="start-simulation-button", n_clicks=0, color="primary", className="mr-1")),
-                                    dbc.Col(dbc.Button("Stop Simulation", id="stop-simulation-button", n_clicks=0, color="secondary", className="mr-1")),
-                                    dbc.Col(dbc.Button("Simulate fault", id="fault-simulation-button", n_clicks=0, color="warning", className="mr-1")),
-                                ],
-                                id = "Badges_anomalies",
-                            ),
+                            #html.Hr(),
+                            #dbc.Row(
+                            #    [
+                            #        dbc.Col(dbc.Button("Start Simulation", id="start-simulation-button", n_clicks=0, color="primary", className="mr-1")),
+                            #        dbc.Col(dbc.Button("Stop Simulation", id="stop-simulation-button", n_clicks=0, color="secondary", className="mr-1")),
+                            #        dbc.Col(dbc.Button("Simulate fault", id="fault-simulation-button", n_clicks=0, color="warning", className="mr-1")),
+                            #    ],
+                            #    id = "Badges_anomalies",
+                            #),
                         ],
                         width=6,
                     ),
                 ],
                 style={'textAlign': 'center'},
             ),
-
+            html.Br(),
             dbc.Row(
                 [
                     dbc.Col(
@@ -181,6 +181,8 @@ def create_app_layout():
             ),
         ],
         fluid=True,
+        # change background color
+        style={'backgroundColor': '#f2f2f2'}
     )
 
 app.layout = create_app_layout
@@ -205,12 +207,11 @@ def update_image(n):
             Output('info-row', 'children'),
         ], 
         [
-            Input('start-simulation-button', 'n_clicks'),
             Input('interval-component', 'n_intervals'),
         ], 
         prevent_initial_call=True)
 
-def simulation_step(n_clicks, n):
+def simulation_step(n):
     Simulator.simulate_time_step()
     sim_status = Simulator.status_dict
     sim_predictions = Simulator.predictions
@@ -222,17 +223,17 @@ def simulation_step(n_clicks, n):
 
     fig_an_imaging = px.line(x=[i for i in range(len(an_imaging_log))], y=an_imaging_log, markers=True, template="plotly_white")
     fig_an_imaging.update_traces(line=dict(color='#0d0887', width=3))
-    fig_an_imaging.update_layout(transition_duration=100)
+    fig_an_imaging.update_layout(transition_duration=200)
 
     fig_an_variables = px.line(x=[i for i in range(len(an_variables_log))], y=an_variables_log, markers=True, template="plotly_white")
     fig_an_variables.update_traces(line=dict(color='#bd3786', width=3))
-    fig_an_variables.update_layout(transition_duration=100)
+    fig_an_variables.update_layout(transition_duration=200)
 
     fig_simulation = go.Figure()
     fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO))], y=sim_log_CO, name='CO(mg/m^3)', line=dict(color='green', width=4)))
     fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO)-1,len(sim_log_CO)+10-1)], y=sim_predictions, name='CO(mg/m^3) predicted', line=dict(color='blue', width=4, dash='dash')))
     fig_simulation.add_trace(go.Scatter(x=[i for i in range(len(sim_log_CO)+10-1)], y=[Simulator.threshold for i in range(len(sim_log_CO)+10-1)], name='threshold', line=dict(color='red', width=3, dash='dot')))
-    fig_simulation.update_layout(transition_duration=100)
+    fig_simulation.update_layout(transition_duration=200)
     fig_simulation.update_layout(template="plotly_white")
 
     if an_imaging > 0.0:
@@ -246,7 +247,7 @@ def simulation_step(n_clicks, n):
 
     info_row = [
         dbc.Col(html.H4(["People detected ",dbc.Badge(sim_status["N_people"], color="light", text_color="info", className="ms-1")])),
-        dbc.Col(html.H4(["Pump power ",dbc.Badge(str(sim_status["Ambient-Air-Pump_power(%)"])+"%", color="light", className="me-1", id="pump-power")])),
+        dbc.Col(html.H4(["Pump power ",dbc.Badge(str(sim_status["Ambient-Air-Pump_power(%)"])+"%", color="light", className="me-1")])),
         dbc.Col(html.H4(["Anomaly score (variables) ", dbc.Badge(an_variables, color=color_badge_variables, className="me-1")])),
         dbc.Col(html.H4(["Anomaly score (imaging) ", dbc.Badge(an_imaging, color=color_badge_imaging, className="me-1")]))
     ]
