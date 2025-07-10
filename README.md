@@ -66,6 +66,10 @@ The system consists of several interconnected components:
 - **Compact Interface**: Optimized for on-top monitoring (225x710 pixels)
 - **Flask Backend**: Runs the web interface in a desktop window
 
+
+![Web-based Dashboard Running](app_running.png)
+
+---
 ## Key Features
 
 ### 🎯 **Real-time Monitoring**
